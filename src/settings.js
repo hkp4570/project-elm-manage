@@ -1,6 +1,6 @@
 module.exports = {
 
-  title: 'Vue Admin Template',
+  title: 'project-elm-manage',
 
   /**
    * @type {boolean} true | false

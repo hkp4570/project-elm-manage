@@ -1,6 +1,7 @@
 import { login, logout, getInfo } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
+import de from "element-ui/src/locale/lang/de";
 
 const getDefaultState = () => {
   return {
@@ -32,10 +33,11 @@ const actions = {
   login({ commit }, userInfo) {
     const { username, password } = userInfo
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
-        const { data } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
+      login({ user_name: username.trim(), password: password }).then((res) => {
+        console.log(res, 'res')
+        const token = '登录成功';
+        commit('SET_TOKEN', token)
+        setToken(token)
         resolve()
       }).catch(error => {
         reject(error)
@@ -46,16 +48,16 @@ const actions = {
   // get user info
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
+      getInfo().then(response => {
         const { data } = response
 
         if (!data) {
-          return reject('Verification failed, please Login again.')
+          return reject('登录失败，请重新登录')
         }
 
-        const { name, avatar } = data
+        const { user_name, avatar } = data
 
-        commit('SET_NAME', name)
+        commit('SET_NAME', user_name)
         commit('SET_AVATAR', avatar)
         resolve(data)
       }).catch(error => {
