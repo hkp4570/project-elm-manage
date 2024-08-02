@@ -31,14 +31,19 @@
         <span class="btn-text">管理员</span>
       </el-button>
     </el-row>
+    <Tendency></Tendency>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
+import Tendency from '@/components/tendency.vue';
 
 export default {
   name: 'Dashboard',
+  components:{
+    Tendency
+  },
   computed: {
     ...mapGetters([
       'name'
