@@ -31,6 +31,28 @@ export const constantRoutes = [
   },
 
   {
+    path: '/dataManage',
+    component: Layout,
+    redirect: '/dataManage/userList',
+    name: '数据管理',
+    meta: { title: '数据管理' },
+    children: [
+      {
+        path: 'userList',
+        name: '用户列表',
+        component: () => import('@/views/dataManage/userList.vue'),
+        meta: { title: '用户列表' }
+      },
+      {
+        path: 'merchant',
+        name: '商家列表',
+        component: () => import('@/views/dataManage/merchant.vue'),
+        meta: {title: '商家列表'}
+      }
+    ]
+  },
+
+  {
     path: '/example',
     component: Layout,
     redirect: '/example/table',

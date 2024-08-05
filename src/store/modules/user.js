@@ -1,7 +1,6 @@
-import { login, logout, getInfo } from '@/api/user'
-import { getToken, setToken, removeToken } from '@/utils/auth'
-import { resetRouter } from '@/router'
-import de from "element-ui/src/locale/lang/de";
+import {login, logout, getInfo, getUserList} from '@/api/user'
+import {getToken, setToken, removeToken} from '@/utils/auth'
+import {resetRouter} from '@/router'
 
 const getDefaultState = () => {
   return {
@@ -30,10 +29,10 @@ const mutations = {
 
 const actions = {
   // user login
-  login({ commit }, userInfo) {
-    const { username, password } = userInfo
+  login({commit}, userInfo) {
+    const {username, password} = userInfo
     return new Promise((resolve, reject) => {
-      login({ user_name: username.trim(), password: password }).then((res) => {
+      login({user_name: username.trim(), password: password}).then((res) => {
         console.log(res, 'res')
         const token = '登录成功';
         commit('SET_TOKEN', token)
@@ -46,16 +45,16 @@ const actions = {
   },
 
   // get user info
-  getInfo({ commit, state }) {
+  getInfo({commit, state}) {
     return new Promise((resolve, reject) => {
       getInfo().then(response => {
-        const { data } = response
+        const {data} = response
 
         if (!data) {
           return reject('登录失败，请重新登录')
         }
 
-        const { user_name, avatar } = data
+        const {user_name, avatar} = data
 
         commit('SET_NAME', user_name)
         commit('SET_AVATAR', avatar)
@@ -67,7 +66,7 @@ const actions = {
   },
 
   // user logout
-  logout({ commit, state }) {
+  logout({commit, state}) {
     return new Promise((resolve, reject) => {
       logout(state.token).then(() => {
         removeToken() // must remove  token  first
@@ -81,11 +80,24 @@ const actions = {
   },
 
   // remove token
-  resetToken({ commit }) {
+  resetToken({commit}) {
     return new Promise(resolve => {
       removeToken() // must remove  token  first
       commit('RESET_STATE')
       resolve()
+    })
+  },
+
+  // 用户列表
+  getUserList({commit, state}, data) {
+    return new Promise((resolve, reject) => {
+      getUserList(data).then(resp => {
+        if (resp.message) {
+          reject(resp.message);
+        } else {
+          resolve(resp)
+        }
+      })
     })
   }
 }
