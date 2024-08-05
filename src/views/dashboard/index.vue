@@ -31,13 +31,15 @@
         <span class="btn-text">管理员</span>
       </el-button>
     </el-row>
-    <Tendency></Tendency>
+    <Tendency :sevenData="sevenData" :sevenDay="sevenDay"></Tendency>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
 import Tendency from '@/components/tendency.vue';
+import moment from "moment/moment";
+import { userCount, orderCount, adminDayCount } from '@/api/dashboard';
 
 export default {
   name: 'Dashboard',
@@ -57,10 +59,17 @@ export default {
       allUserCount: null,
       allOrderCount: null,
       allAdminCount: null,
+      sevenDay: [],
+      sevenData:[[],[],[]],
     }
   },
   mounted() {
     this.initData();
+    for (let i = 6; i > -1 ; i--) {
+      const date = moment(new Date().getTime() - 86400000*i).format('YYYY-MM-DD');
+      this.sevenDay.push(date);
+    }
+    this.getSevenData();
   },
   methods:{
     initData(){
@@ -71,6 +80,26 @@ export default {
         this.allUserCount = response[3].count;
         this.allOrderCount = response[4].count;
         this.allAdminCount = response[5].count;
+      })
+    },
+    getSevenData(){
+      const apiArr = [[],[],[]];
+      this.sevenDay.forEach(item => {
+        apiArr[0].push(userCount(item));
+        apiArr[1].push(orderCount(item));
+        apiArr[2].push(adminDayCount(item));
+      })
+      const promiseArr = [...apiArr[0],...apiArr[1],...apiArr[2]];
+      Promise.all(promiseArr).then(res => {
+        const resArr = [[],[],[]];
+        res.forEach((item,index) => {
+          if(item.status === 1){
+            resArr[Math.floor(index/7)].push(item.count);
+          }
+        })
+        this.sevenData = resArr;
+      }).catch(e => {
+        console.log(e);
       })
     }
   }
