@@ -103,14 +103,5 @@ export default {
 </template>
 
 <style scoped lang="scss">
-.block {
-  position: relative;
-  margin-top: 30px;
-  padding-bottom: 100px;
-
-  .pagination {
-    position: absolute;
-    right: 0;
-  }
-}
+@import "@/styles/index";
 </style>

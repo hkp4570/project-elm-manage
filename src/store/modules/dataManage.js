@@ -1,24 +1,53 @@
-import { cityGuess } from '@/api/services';
+import {cityGuess, getRestaurantApi, getRestaurantCountApi} from '@/api/services';
 
 export default {
   namespaced: true,
-  state:{
-    city: {},
+  state: {
+    restaurantCount: 0,
+    restaurantList: [],
   },
-  mutations:{
-    setState(state, data){
-
+  mutations: {
+    setState(state, data) {
+      const keys = Object.keys(data);
+      keys.forEach(key => {
+        state[key] = data[key];
+      })
     }
   },
-  actions:{
-    getCity(){
+  actions: {
+    getCity() {
       return new Promise((resolve, reject) => {
         cityGuess().then(resp => {
-          console.log(resp ,'resp');
           if (resp.message) {
             reject(resp.message);
           } else {
             resolve(resp)
+          }
+        })
+      })
+    },
+    getRestaurantCount({commit}) {
+      return new Promise((resolve, reject) => {
+        getRestaurantCountApi().then(resp => {
+          if (resp.message) {
+            reject(resp.message);
+          } else {
+            commit('setState', {restaurantCount: resp.count})
+          }
+        })
+      })
+    },
+    async getRestaurantList({commit},data) {
+      const { offset, limit } = data;
+      const city = await this.dispatch('dataManage/getCity');
+      return new Promise((resolve, reject) => {
+        getRestaurantApi({
+          latitude: city?.latitude, longitude: city?.longitude, offset, limit,
+        }).then(resp => {
+          if (resp.message) {
+            reject(resp.message);
+          } else {
+            commit('setState', {restaurantList: resp})
           }
         })
       })
