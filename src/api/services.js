@@ -22,3 +22,19 @@ export function getRestaurantApi({latitude,longitude,offset,limit}){
     method: 'get',
   })
 }
+
+// 获取搜索地址
+export function searchPlace(cityId, keyword){
+  return request({
+    url: `/elm/v1/pois?type=search&city_id=${cityId}&keyword=${keyword}`,
+    method: 'get',
+  })
+}
+
+// 食物分类
+export function foodCategory(latitude, longitude){
+  return request({
+    url: `/elm/shopping/v2/restaurant/category?latitude=${latitude}&longitude=${longitude}`,
+    method: 'get',
+  })
+}

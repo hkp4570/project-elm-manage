@@ -5,6 +5,7 @@ export default {
   state: {
     restaurantCount: 0,
     restaurantList: [],
+    city: {},
   },
   mutations: {
     setState(state, data) {
@@ -15,13 +16,14 @@ export default {
     }
   },
   actions: {
-    getCity() {
+    getCity({commit}) {
       return new Promise((resolve, reject) => {
         cityGuess().then(resp => {
           if (resp.message) {
             reject(resp.message);
           } else {
-            resolve(resp)
+            commit('setState', {city: resp})
+            resolve(resp);
           }
         })
       })
