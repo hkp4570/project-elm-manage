@@ -10,7 +10,8 @@ export default {
       dialogVisible: false,
       selectTable: {},
       addressList: null,
-      categoryOptions: [],
+      selectedCategory: [],
+      selectAddress: {},
     }
   },
   created() {
@@ -21,6 +22,7 @@ export default {
       restaurantCount: state => state.dataManage.restaurantCount,
       restaurantList: state => state.dataManage.restaurantList,
       city: state => state.dataManage.city,
+      categoryOptions: state => state.dataManage.categoryOptions,
     }),
   },
   methods: {
@@ -28,8 +30,9 @@ export default {
       this.$store.dispatch('dataManage/getRestaurantCount');
       this.$store.dispatch('dataManage/getRestaurantList', {offset: this.offset, limit: this.limit});
     },
-    getCategory(){
-
+    // 获取店铺分类
+    getCategory() {
+      this.$store.dispatch('dataManage/getFoodCategory');
     },
     handleCurrentChange(val) {
       this.offset = val - 1;
@@ -40,38 +43,68 @@ export default {
       this.initData();
     },
     handleEdit(index, row) {
-      console.log(index, row);
       this.selectTable = row;
       this.dialogVisible = true;
-      if(!this.categoryOptions.length){
-
+      this.selectedCategory = row.category.split('/');
+      if (!this.categoryOptions.length) {
+        this.getCategory();
       }
     },
-    addressSelect(address){
-
+    async handleDelete(index,row){
+      const result = await this.$store.dispatch('dataManage/deleteRestaurant',row.id);
+      if(result.status === 1){
+        this.$message.success(result.message);
+      }else{
+        this.$message.error(result.message);
+      }
     },
-    async querySearchAsync(queryString,cb){
-      if(queryString && !this.addressList){
-        try{
-         const cityList = await searchPlace(this.city.id, queryString);
-         if(Array.isArray(cityList)){
-           const _cityList = cityList.map(item => {
-             item.value = item.address;
-             return item;
-           })
-           this.addressList = cityList;
-           cb(_cityList);
-         }
-        }catch (e) {
+    addressSelect(addr) {
+      const {latitude, longitude, address} = addr;
+      this.selectAddress = {latitude, longitude, address, location:[longitude,latitude]};
+    },
+    async querySearchAsync(queryString, cb) {
+      if (queryString && !this.addressList) {
+        try {
+          const cityList = await searchPlace(this.city.id, queryString);
+          if (Array.isArray(cityList)) {
+            const _cityList = cityList.map(item => {
+              item.value = item.address;
+              return item;
+            })
+            this.addressList = cityList;
+            cb(_cityList);
+          }
+        } catch (e) {
           console.log(e);
         }
       }
-      if(this.addressList){
+      if (this.addressList) {
         cb(this.addressList);
       }
     },
-    categoryOptions(){
-
+    beforeAvatarUpload(file) {
+      if (file.type !== 'image/jpeg' || file.type !== 'image/png') {
+        this.$message.error('请上传jpg/png格式的图片');
+        return false;
+      }
+      if (file.size / 1024 / 1024 > 2) {
+        this.$message.error('图片大小不能超过2M');
+        return false;
+      }
+      return true;
+    },
+    handleServiceAvatarSuccess(res) {
+      if (+res.status === 1) {
+        this.selectTable.image_path = res.image_path;
+      } else {
+        this.$message.error('上传图片失败！');
+      }
+    },
+    async updateShop() {
+      Object.assign(this.selectTable,this.selectAddress);
+      this.selectTable.category = this.selectedCategory.join('/');
+      const message = await this.$store.dispatch('dataManage/updateRestaurant',this.selectTable);
+      this.$message.info(message);
     }
   }
 }
@@ -176,7 +209,7 @@ export default {
             style="width: 100%;"
             @select="addressSelect"
           ></el-autocomplete>
-          <span>当前城市：{{city.name}}</span>
+          <span>当前城市：{{ city.name }}</span>
         </el-form-item>
         <el-form-item label="店铺介绍" label-width="100px">
           <el-input v-model="selectTable.description"></el-input>
@@ -192,12 +225,23 @@ export default {
           ></el-cascader>
         </el-form-item>
         <el-form-item label="店铺图片" label-width="100px">
-
+          <el-upload
+            accept=".jpeg,.jpg,.png"
+            class="avatar-uploader"
+            action="https://elm.cangdu.org/v1/addimg/shop"
+            :show-file-list="false"
+            :before-upload="beforeAvatarUpload"
+            :on-success="handleServiceAvatarSuccess"
+          >
+            <img v-if="selectTable.image_path" :src="'https://elm.cangdu.org/img/' + selectTable.image_path"
+                 class="avatar" alt="">
+            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+          </el-upload>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-    <el-button @click="centerDialogVisible = false">取 消</el-button>
-    <el-button type="primary" @click="centerDialogVisible = false">确 定</el-button>
+    <el-button @click="dialogVisible = false">取 消</el-button>
+    <el-button type="primary" @click="updateShop">确 定</el-button>
   </span>
     </el-dialog>
   </div>

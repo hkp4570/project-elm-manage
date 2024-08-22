@@ -1,4 +1,11 @@
-import {cityGuess, getRestaurantApi, getRestaurantCountApi} from '@/api/services';
+import {
+  cityGuess,
+  deleteRestaurantApi,
+  foodCategoryApi,
+  getRestaurantApi,
+  getRestaurantCountApi,
+  updateRestaurantApi
+} from '@/api/services';
 
 export default {
   namespaced: true,
@@ -6,6 +13,7 @@ export default {
     restaurantCount: 0,
     restaurantList: [],
     city: {},
+    categoryOptions: []
   },
   mutations: {
     setState(state, data) {
@@ -39,8 +47,8 @@ export default {
         })
       })
     },
-    async getRestaurantList({commit},data) {
-      const { offset, limit } = data;
+    async getRestaurantList({commit}, data) {
+      const {offset, limit} = data;
       const city = await this.dispatch('dataManage/getCity');
       return new Promise((resolve, reject) => {
         getRestaurantApi({
@@ -53,6 +61,55 @@ export default {
           }
         })
       })
+    },
+    async getFoodCategory({commit}) {
+      const response = await foodCategoryApi();
+      if (response.message) {
+        throw new Error(response.message);
+      } else {
+        const _options = [];
+        response.forEach(item => {
+          if (item.sub_categories.length) {
+            const addnew = {
+              value: item.name,
+              label: item.name,
+              children: []
+            }
+            item.sub_categories.forEach((subitem, index) => {
+              if (index === 0) {
+                return
+              }
+              addnew.children.push({
+                value: subitem.name,
+                label: subitem.name,
+              })
+            })
+            _options.push(addnew)
+          }
+        })
+        commit('setState', {categoryOptions: _options});
+      }
+    },
+    async updateRestaurant(_, data) {
+      const response = await updateRestaurantApi(data);
+      if (response.message) {
+        return response.message;
+      }
+      return '修改成功';
+    },
+    async deleteRestaurant(_, id) {
+      const response = await deleteRestaurantApi(id);
+      if (response.status === 0) {
+        return {
+          message: response.message,
+          status: 0
+        }
+      } else {
+        return {
+          status: 1,
+          message: '删除成功'
+        }
+      }
     }
   }
 }

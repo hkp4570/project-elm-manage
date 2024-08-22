@@ -31,10 +31,26 @@ export function searchPlace(cityId, keyword){
   })
 }
 
-// 食物分类
-export function foodCategory(latitude, longitude){
+// 店铺食物分类
+export function foodCategoryApi(latitude, longitude){
   return request({
     url: `/elm/shopping/v2/restaurant/category?latitude=${latitude}&longitude=${longitude}`,
     method: 'get',
+  })
+}
+
+// 更新餐馆信息
+export function updateRestaurantApi(data){
+  return request({
+    url: '/elm/shopping/updateshop',
+    method: 'post',
+    data,
+  })
+}
+// 删除餐馆
+export function deleteRestaurantApi(restaurant_id){
+  return request({
+    url: `/elm/shopping/restaurant/${restaurant_id}`,
+    method: 'delete',
   })
 }

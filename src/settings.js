@@ -2,6 +2,8 @@ module.exports = {
 
   title: 'project-elm-manage',
 
+  hidden: false,
+
   /**
    * @type {boolean} true | false
    * @description Whether fix the header
