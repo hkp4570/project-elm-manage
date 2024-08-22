@@ -1,10 +1,12 @@
+import Vue from 'vue';
 import {
   cityGuess,
   deleteRestaurantApi,
   foodCategoryApi,
+  getFoodsCountApi,
   getRestaurantApi,
   getRestaurantCountApi,
-  updateRestaurantApi
+  updateRestaurantApi,
 } from '@/api/services';
 
 export default {
@@ -13,81 +15,85 @@ export default {
     restaurantCount: 0,
     restaurantList: [],
     city: {},
-    categoryOptions: []
+    categoryOptions: [],
+    foodListCount: 0,
   },
   mutations: {
     setState(state, data) {
       const keys = Object.keys(data);
-      keys.forEach(key => {
+      keys.forEach((key) => {
         state[key] = data[key];
-      })
-    }
+      });
+    },
   },
   actions: {
-    getCity({commit}) {
+    getCity({ commit }) {
       return new Promise((resolve, reject) => {
-        cityGuess().then(resp => {
+        cityGuess().then((resp) => {
           if (resp.message) {
             reject(resp.message);
           } else {
-            commit('setState', {city: resp})
+            commit('setState', { city: resp });
             resolve(resp);
           }
-        })
-      })
+        });
+      });
     },
-    getRestaurantCount({commit}) {
+    getRestaurantCount({ commit }) {
       return new Promise((resolve, reject) => {
-        getRestaurantCountApi().then(resp => {
+        getRestaurantCountApi().then((resp) => {
           if (resp.message) {
             reject(resp.message);
           } else {
-            commit('setState', {restaurantCount: resp.count})
+            commit('setState', { restaurantCount: resp.count });
           }
-        })
-      })
+        });
+      });
     },
-    async getRestaurantList({commit}, data) {
-      const {offset, limit} = data;
+    async getRestaurantList({ commit }, data) {
+      const { offset, limit } = data;
       const city = await this.dispatch('dataManage/getCity');
       return new Promise((resolve, reject) => {
         getRestaurantApi({
-          latitude: city?.latitude, longitude: city?.longitude, offset, limit,
-        }).then(resp => {
+          latitude: city?.latitude,
+          longitude: city?.longitude,
+          offset,
+          limit,
+        }).then((resp) => {
           if (resp.message) {
             reject(resp.message);
           } else {
-            commit('setState', {restaurantList: resp})
+            commit('setState', { restaurantList: resp });
           }
-        })
-      })
+        });
+      });
     },
-    async getFoodCategory({commit}) {
+    async getFoodCategory({ commit }) {
       const response = await foodCategoryApi();
       if (response.message) {
         throw new Error(response.message);
       } else {
         const _options = [];
-        response.forEach(item => {
+        response.forEach((item) => {
           if (item.sub_categories.length) {
             const addnew = {
               value: item.name,
               label: item.name,
-              children: []
-            }
+              children: [],
+            };
             item.sub_categories.forEach((subitem, index) => {
               if (index === 0) {
-                return
+                return;
               }
               addnew.children.push({
                 value: subitem.name,
                 label: subitem.name,
-              })
-            })
-            _options.push(addnew)
+              });
+            });
+            _options.push(addnew);
           }
-        })
-        commit('setState', {categoryOptions: _options});
+        });
+        commit('setState', { categoryOptions: _options });
       }
     },
     async updateRestaurant(_, data) {
@@ -102,14 +108,22 @@ export default {
       if (response.status === 0) {
         return {
           message: response.message,
-          status: 0
-        }
+          status: 0,
+        };
       } else {
         return {
           status: 1,
-          message: '删除成功'
-        }
+          message: '删除成功',
+        };
       }
-    }
-  }
-}
+    },
+    async getFoodsCount({ commit }) {
+      const response = await getFoodsCountApi();
+      if (response.status === 1) {
+        commit('setState', { foodListCount: response.count });
+      } else {
+        throw new Error(response.message);
+      }
+    },
+  },
+};
