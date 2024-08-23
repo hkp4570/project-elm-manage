@@ -57,6 +57,12 @@ export const constantRoutes = [
         component: () => import('@/views/dataManage/foodList.vue'),
         meta: { title: '食品列表' },
       },
+      {
+        path: 'orderList',
+        name: '订单列表',
+        component: () => import('@/views/dataManage/orderList.vue'),
+        meta: {title: '订单列表'}
+      }
     ],
   },
 

@@ -2,12 +2,12 @@ import Vue from 'vue';
 import {
   cityGuess,
   deleteRestaurantApi,
-  foodCategoryApi,
+  foodCategoryApi, getAddressByIdApi,
   getFoodsApi,
   getFoodsCountApi,
-  getMenuApi,
+  getMenuApi, getOrderCountApi, getOrderListApi,
   getRestaurantApi,
-  getRestaurantCountApi, updateFoodApi,
+  getRestaurantCountApi, getRestaurantDetail, getUserInfoApi, updateFoodApi,
   updateRestaurantApi,
 } from '@/api/services';
 
@@ -21,6 +21,8 @@ export default {
     foodListCount: 0,
     foodList: [],
     menuOptions: [],
+    orderListCount: 0,
+    orderList: [],
   },
   mutations: {
     setState(state, data) {
@@ -29,33 +31,36 @@ export default {
         state[key] = data[key];
       });
     },
+    setOrderList(state, data) {
+      Vue.set(state.orderList, data.index, {...state.orderList[data.index], ...data})
+    }
   },
   actions: {
-    getCity({ commit }) {
+    getCity({commit}) {
       return new Promise((resolve, reject) => {
         cityGuess().then((resp) => {
           if (resp.message) {
             reject(resp.message);
           } else {
-            commit('setState', { city: resp });
+            commit('setState', {city: resp});
             resolve(resp);
           }
         });
       });
     },
-    getRestaurantCount({ commit }) {
+    getRestaurantCount({commit}) {
       return new Promise((resolve, reject) => {
         getRestaurantCountApi().then((resp) => {
           if (resp.message) {
             reject(resp.message);
           } else {
-            commit('setState', { restaurantCount: resp.count });
+            commit('setState', {restaurantCount: resp.count});
           }
         });
       });
     },
-    async getRestaurantList({ commit }, data) {
-      const { offset, limit } = data;
+    async getRestaurantList({commit}, data) {
+      const {offset, limit} = data;
       const city = await this.dispatch('dataManage/getCity');
       return new Promise((resolve, reject) => {
         getRestaurantApi({
@@ -67,12 +72,12 @@ export default {
           if (resp.message) {
             reject(resp.message);
           } else {
-            commit('setState', { restaurantList: resp });
+            commit('setState', {restaurantList: resp});
           }
         });
       });
     },
-    async getFoodCategory({ commit }) {
+    async getFoodCategory({commit}) {
       const response = await foodCategoryApi();
       if (response.message) {
         throw new Error(response.message);
@@ -97,7 +102,7 @@ export default {
             _options.push(addnew);
           }
         });
-        commit('setState', { categoryOptions: _options });
+        commit('setState', {categoryOptions: _options});
       }
     },
     async updateRestaurant(_, data) {
@@ -121,16 +126,16 @@ export default {
         };
       }
     },
-    async getFoodsCount({ commit }) {
+    async getFoodsCount({commit}) {
       const response = await getFoodsCountApi();
       if (response.status === 1) {
-        commit('setState', { foodListCount: response.count });
+        commit('setState', {foodListCount: response.count});
       } else {
         throw new Error(response.message);
       }
     },
-    async getFoods({ commit }, { offset, limit }) {
-      const response = await getFoodsApi({ offset, limit });
+    async getFoods({commit}, {offset, limit}) {
+      const response = await getFoodsApi({offset, limit});
       if (response.message) {
         throw new Error(response.message);
       } else {
@@ -149,10 +154,10 @@ export default {
           tableData.index = index;
           data.push(tableData);
         });
-        commit('setState', { foodList: data });
+        commit('setState', {foodList: data});
       }
     },
-    async getMenu({ commit }, data) {
+    async getMenu({commit}, data) {
       const response = await getMenuApi(data);
       if (response.message) {
         throw new Error(response.message);
@@ -165,12 +170,48 @@ export default {
             index,
           });
         });
-        commit('setState', { menuOptions: menuOptions });
+        commit('setState', {menuOptions: menuOptions});
       }
     },
-    async updateFood(_,data){
+    async updateFood(_, data) {
       const response = await updateFoodApi(data);
       return response.status === 1;
+    },
+    async getOrderList({commit}, data) {
+      const respCount = await getOrderCountApi();
+      if (respCount.status === 1) {
+        commit('setState', {orderListCount: respCount.count});
+      }
+      const respList = await getOrderListApi(data);
+      if (!respList.message) {
+        const data = [];
+        respList.forEach((item, index) => {
+          const tableData = {};
+          tableData.id = item.id;
+          tableData.total_amount = item.total_amount;
+          tableData.status = item.status_bar.title;
+          tableData.user_id = item.user_id;
+          tableData.restaurant_id = item.restaurant_id;
+          tableData.address_id = item.address_id;
+          tableData.index = index;
+          data.push(tableData);
+        })
+        commit('setState', {orderList: data});
+      } else {
+        throw new Error(respList.message);
+      }
+    },
+    async getOrderDetail({commit}, data) {
+      const {restaurant_id, address_id, user_id, index} = data;
+      const [restaurant, addressInfo, userInfo] = await Promise.all([getRestaurantDetail(restaurant_id), getAddressByIdApi(address_id), getUserInfoApi(user_id)])
+      const expandData = {
+        restaurant_name: restaurant.name,
+        restaurant_address: restaurant.address,
+        address: addressInfo.address,
+        user_name: userInfo.username,
+        index
+      };
+      commit('setOrderList', expandData);
     }
   },
 };

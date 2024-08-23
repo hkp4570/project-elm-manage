@@ -109,3 +109,36 @@ export function deleteFood(food_id) {
     method: 'delete',
   });
 }
+
+// 获取订单数量
+export function getOrderCountApi(data){
+  return request({
+    url: '/elm/bos/orders/count',
+    method: 'get',
+  });
+}
+
+// 获取订单列表
+export function getOrderListApi(data){
+  const {offset,limit} = data;
+  return request({
+    url: `/elm/bos/orders?offset=${offset}&limit=${limit}`,
+    method: 'get',
+  });
+}
+
+// 获取用户信息
+export function getUserInfoApi(user_id) {
+  return request({
+    url: `/elm/v1/user/${user_id}`,
+    method: 'get',
+  });
+}
+
+// 获取地址信息
+export function getAddressByIdApi(address_id) {
+  return request({
+    url: `/elm/v1/addresse/${address_id}`,
+    method: 'get',
+  });
+}
