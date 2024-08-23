@@ -3,9 +3,11 @@ import {
   cityGuess,
   deleteRestaurantApi,
   foodCategoryApi,
+  getFoodsApi,
   getFoodsCountApi,
+  getMenuApi,
   getRestaurantApi,
-  getRestaurantCountApi,
+  getRestaurantCountApi, updateFoodApi,
   updateRestaurantApi,
 } from '@/api/services';
 
@@ -17,6 +19,8 @@ export default {
     city: {},
     categoryOptions: [],
     foodListCount: 0,
+    foodList: [],
+    menuOptions: [],
   },
   mutations: {
     setState(state, data) {
@@ -125,5 +129,48 @@ export default {
         throw new Error(response.message);
       }
     },
+    async getFoods({ commit }, { offset, limit }) {
+      const response = await getFoodsApi({ offset, limit });
+      if (response.message) {
+        throw new Error(response.message);
+      } else {
+        const data = [];
+        response.forEach((item, index) => {
+          const tableData = {};
+          tableData.name = item.name;
+          tableData.item_id = item.item_id;
+          tableData.description = item.description;
+          tableData.rating = item.rating;
+          tableData.month_sales = item.month_sales;
+          tableData.restaurant_id = item.restaurant_id;
+          tableData.category_id = item.category_id;
+          tableData.image_path = item.image_path;
+          tableData.specfoods = item.specfoods;
+          tableData.index = index;
+          data.push(tableData);
+        });
+        commit('setState', { foodList: data });
+      }
+    },
+    async getMenu({ commit }, data) {
+      const response = await getMenuApi(data);
+      if (response.message) {
+        throw new Error(response.message);
+      } else {
+        const menuOptions = [];
+        response.forEach((item, index) => {
+          menuOptions.push({
+            label: item.name,
+            value: item.id,
+            index,
+          });
+        });
+        commit('setState', { menuOptions: menuOptions });
+      }
+    },
+    async updateFood(_,data){
+      const response = await updateFoodApi(data);
+      return response.status === 1;
+    }
   },
 };

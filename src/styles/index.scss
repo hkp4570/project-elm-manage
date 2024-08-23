@@ -74,3 +74,15 @@ div:focus {
     right: 0;
   }
 }
+
+.drawer-content{
+  height: 100%;
+  position: relative;
+  .drawer-footer{
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    z-index: 999;
+  }
+}
+

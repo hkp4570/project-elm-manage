@@ -62,3 +62,50 @@ export function getFoodsCountApi() {
     method: 'get',
   });
 }
+
+// 食物列表
+export function getFoodsApi({ offset, limit }) {
+  return request({
+    url: `/elm/shopping/v2/foods?offset=${offset}&limit=${limit}`,
+    method: 'get',
+  });
+}
+
+// 获取餐馆详细信息
+export function getRestaurantDetail(id) {
+  return request({
+    url: `/elm/shopping/restaurant/${id}`,
+    method: 'get',
+  });
+}
+
+// 获取当前食品的分类
+export function getMenuById(id) {
+  return request({
+    url: `/elm/shopping/v2/menu/${id}`,
+    method: 'get',
+  });
+}
+// 获取所有食品的分类
+export function getMenuApi({ restaurant_id, allMenu }) {
+  return request({
+    url: `/elm/shopping/v2/menu?restaurant_id=${restaurant_id}&allMenu=${allMenu}`,
+    method: 'get',
+  });
+}
+
+// 更新食品信息
+export function updateFoodApi(data) {
+  return request({
+    url: '/elm/shopping/v2/updatefood',
+    method: 'post',
+    data,
+  });
+}
+// 删除食品
+export function deleteFood(food_id) {
+  return request({
+    url: `/elm/shopping/v2/food/${food_id}`,
+    method: 'delete',
+  });
+}
