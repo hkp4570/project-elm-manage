@@ -37,7 +37,6 @@ export default {
         //   }
         // },
         xAxis: {
-          type: 'category',
           boundaryGap: false,
           data: this.sevenDay
         },
