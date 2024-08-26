@@ -113,7 +113,15 @@ export default {
       }
       this.myChart.setOption(options);
     }
-  }
+  },
+  watch: {
+    sevenData() {
+      this.initChartData();
+    },
+    sevenDay() {
+      this.initChartData();
+    }
+}
 }
 </script>
 
