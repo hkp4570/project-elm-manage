@@ -150,3 +150,12 @@ export function getUserCity() {
     method: 'get',
   });
 }
+
+// 添加商铺
+export function addShop(data) {
+  return request({
+    url: '/elm/shopping/addshop',
+    method: 'post',
+    data,
+  });
+}

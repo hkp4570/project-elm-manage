@@ -65,6 +65,27 @@ export const constantRoutes = [
       }
     ],
   },
+  {
+    path: '/addData',
+    component: Layout,
+    redirect: '/addData/addShop',
+    name: '添加数据',
+    meta: {title: '添加数据'},
+    children: [
+      {
+        path: 'addShop',
+        name: '添加商铺',
+        component: () => import('@/views/addData/addShop.vue'),
+        meta: {title: '添加商铺'}
+      },
+      // {
+      //   path: 'addFood',
+      //   name: '添加食品',
+      //   component: () => import('@/views/addData/addFood.vue'),
+      //   meta: {title: '添加食品'}
+      // }
+    ]
+  },
 
   {
     path: '/visitor',
