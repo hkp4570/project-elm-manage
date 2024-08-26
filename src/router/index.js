@@ -78,12 +78,12 @@ export const constantRoutes = [
         component: () => import('@/views/addData/addShop.vue'),
         meta: {title: '添加商铺'}
       },
-      // {
-      //   path: 'addFood',
-      //   name: '添加食品',
-      //   component: () => import('@/views/addData/addFood.vue'),
-      //   meta: {title: '添加食品'}
-      // }
+      {
+        path: 'addFood',
+        name: '添加食品',
+        component: () => import('@/views/addData/addFood.vue'),
+        meta: {title: '添加食品'}
+      }
     ]
   },
 

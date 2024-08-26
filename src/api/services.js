@@ -159,3 +159,28 @@ export function addShop(data) {
     data,
   });
 }
+
+// 获取当前店铺的食品种类
+export function getCategory(restaurant_id) {
+  return fetch(`https://elm.cangdu.org/shopping/getcategory/${restaurant_id}`,{
+    method:'get'
+  }).then(resp => resp.json())
+}
+
+// 添加食品种类
+export function addCategory(data){
+  return request({
+    url: '/elm/shopping/addcategory',
+    method: 'post',
+    data,
+  });
+}
+
+// 添加食品
+export function addFood(data){
+  return request({
+    url: '/elm/shopping/addfood',
+    method: 'post',
+    data,
+  })
+}

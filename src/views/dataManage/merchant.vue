@@ -50,17 +50,17 @@ export default {
         this.getCategory();
       }
     },
-    async handleDelete(index,row){
-      const result = await this.$store.dispatch('dataManage/deleteRestaurant',row.id);
-      if(result.status === 1){
+    async handleDelete(index, row) {
+      const result = await this.$store.dispatch('dataManage/deleteRestaurant', row.id);
+      if (result.status === 1) {
         this.$message.success(result.message);
-      }else{
+      } else {
         this.$message.error(result.message);
       }
     },
     addressSelect(addr) {
       const {latitude, longitude, address} = addr;
-      this.selectAddress = {latitude, longitude, address, location:[longitude,latitude]};
+      this.selectAddress = {latitude, longitude, address, location: [longitude, latitude]};
     },
     async querySearchAsync(queryString, cb) {
       if (queryString && !this.addressList) {
@@ -101,10 +101,13 @@ export default {
       }
     },
     async updateShop() {
-      Object.assign(this.selectTable,this.selectAddress);
+      Object.assign(this.selectTable, this.selectAddress);
       this.selectTable.category = this.selectedCategory.join('/');
-      const message = await this.$store.dispatch('dataManage/updateRestaurant',this.selectTable);
+      const message = await this.$store.dispatch('dataManage/updateRestaurant', this.selectTable);
       this.$message.info(message);
+    },
+    addFood(index, row) {
+      this.$router.push({path: '/addData/addFood', query: {restaurant_id: row.id}});
     }
   }
 }
@@ -167,7 +170,7 @@ export default {
           <el-button
             size="mini"
             type="danger"
-            @click="handleDelete(scope.$index, scope.row)">添加食品
+            @click="addFood(scope.$index, scope.row)">添加食品
           </el-button>
           <el-button
             size="mini"

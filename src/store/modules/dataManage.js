@@ -2,7 +2,7 @@ import Vue from 'vue';
 import {
   cityGuess,
   deleteRestaurantApi,
-  foodCategoryApi, getAddressByIdApi,
+  foodCategoryApi, getAddressByIdApi, getCategory,
   getFoodsApi,
   getFoodsCountApi,
   getMenuApi, getOrderCountApi, getOrderListApi,
@@ -212,6 +212,18 @@ export default {
         index
       };
       commit('setOrderList', expandData);
+    },
+    async getRestaurantCategory({commit}, {restaurant_id}) {
+      const response = await getCategory(restaurant_id);
+      if (response.status === 1) {
+        response.category_list.map((item, index) => {
+          item.value = index;
+          item.label = item.name;
+        })
+        return response.category_list;
+      } else {
+        throw new Error(response.message);
+      }
     }
   },
 };
