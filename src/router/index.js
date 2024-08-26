@@ -67,6 +67,19 @@ export const constantRoutes = [
   },
 
   {
+    path: '/visitor',
+    component: Layout,
+    children: [
+      {
+        path: 'visitor',
+        name: '用户分布',
+        component: () => import('@/views/visitor.vue'),
+        meta: {title: '用户分布'}
+      }
+    ]
+  },
+
+  {
     path: '/adminset',
     component: Layout,
     children: [
